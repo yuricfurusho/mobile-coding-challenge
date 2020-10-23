@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
+import yuricfurusho.traderev.photos.Photo
 
 private const val SPAN_COUNT = 2
 
@@ -16,6 +17,11 @@ class MainActivity : AppCompatActivity() {
             SPAN_COUNT,
             StaggeredGridLayoutManager.VERTICAL
         )
-//        recycler_photos.adapter = PhotosAdapter()
+        recycler_photos.adapter = PhotoAdapter()
+        (recycler_photos.adapter as PhotoAdapter).setList(
+            listOf(
+                Photo("https://cdn.eso.org/images/screen/eso1907a.jpg")
+            )
+        )
     }
 }
