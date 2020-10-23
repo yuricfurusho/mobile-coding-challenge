@@ -1,36 +1,50 @@
 package yuricfurusho.traderev
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
-import yuricfurusho.traderev.photos.Photo
+import yuricfurusho.traderev.photos.UnsplashService
 
 private const val SPAN_COUNT = 2
 
 class MainActivity : AppCompatActivity() {
+
+    private val compositeDisposable = CompositeDisposable() //TODO: move away from ui into viewModel or repository
+    private val unsplashService = UnsplashService.create() //TODO: remove later: for testing only
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         recycler_photos.layoutManager = StaggeredGridLayoutManager(
-            SPAN_COUNT,
-            StaggeredGridLayoutManager.VERTICAL
+                SPAN_COUNT,
+                StaggeredGridLayoutManager.VERTICAL
         )
         recycler_photos.adapter = PhotoAdapter()
-        (recycler_photos.adapter as PhotoAdapter).setList(
-            listOf(
-                Photo("https://picsum.photos/200/300"),
-                Photo("https://picsum.photos/300/200"),
-                Photo("https://picsum.photos/1500/2000"),
-                Photo("https://picsum.photos/200/400"),
-                Photo("https://picsum.photos/400/200"),
-                Photo("https://picsum.photos/200/600"),
-                Photo("https://picsum.photos/600/300"),
-                Photo("https://picsum.photos/1000/800"),
-                Photo("https://picsum.photos/500/400"),
-                Photo("https://picsum.photos/600/700")
-            )
-        )
+
+
+        unsplashService.getPhotos(1, 10) //TODO: move away from ui into viewModel or repository
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ photoList ->
+                    (recycler_photos.adapter as PhotoAdapter).setList(
+                            photoList.map { it.thumb }
+                    )
+                }, {
+                    Log.e("MainActivity", it.localizedMessage ?: "")
+                })
+                .also {
+                    compositeDisposable.add(it)
+                }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        compositeDisposable.clear() //TODO: move away from ui into viewModel or repository
     }
 }
