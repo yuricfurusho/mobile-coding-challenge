@@ -1,5 +1,6 @@
 package yuricfurusho.traderev
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -7,13 +8,15 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_photo_gallery.*
+import yuricfurusho.traderev.photos.PhotoDetailActivity
+import yuricfurusho.traderev.photos.PhotoDetailActivity.Companion.EXTRA_URL_FULL
 import yuricfurusho.traderev.photos.PhotoGalleryViewModel
 import yuricfurusho.traderev.photos.PhotoRepository.Companion.PHOTOS_PER_PAGE
 import javax.inject.Inject
 
 private const val SPAN_COUNT = 2
 
-class PhotoGalleryActivity : AppCompatActivity() {
+class PhotoGalleryActivity : AppCompatActivity(), PhotoAdapter.PhotoAdapterListener {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -27,8 +30,9 @@ class PhotoGalleryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_photo_gallery)
 
-        photoAdapter = PhotoAdapter()
+        photoAdapter = PhotoAdapter(this)
         gridLayoutManager = GridLayoutManager(this, SPAN_COUNT)
+        //TODO try a better layout
         recycler_photos.apply {
             adapter = photoAdapter
             layoutManager = gridLayoutManager
@@ -56,5 +60,15 @@ class PhotoGalleryActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onItemClick(urlFull: String) {
+        //TODO add ripple animation
+        //TODO convert to the intent pattern through viewModel
+        startActivity(
+            Intent(this, PhotoDetailActivity::class.java).apply {
+                putExtra(EXTRA_URL_FULL, urlFull)
+            }
+        )
     }
 }
