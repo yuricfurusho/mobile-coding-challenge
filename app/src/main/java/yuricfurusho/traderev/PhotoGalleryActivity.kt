@@ -14,8 +14,6 @@ import yuricfurusho.traderev.photos.PhotoGalleryViewModel
 import yuricfurusho.traderev.photos.PhotoRepository.Companion.PHOTOS_PER_PAGE
 import javax.inject.Inject
 
-private const val SPAN_COUNT = 2
-
 class PhotoGalleryActivity : AppCompatActivity(), PhotoAdapter.PhotoAdapterListener {
 
     @Inject
@@ -31,7 +29,7 @@ class PhotoGalleryActivity : AppCompatActivity(), PhotoAdapter.PhotoAdapterListe
         setContentView(R.layout.activity_photo_gallery)
 
         photoAdapter = PhotoAdapter(this)
-        gridLayoutManager = GridLayoutManager(this, SPAN_COUNT)
+        gridLayoutManager = GridLayoutManager(this, resources.getInteger(R.integer.spanCount))
         //TODO try a better layout
         recycler_photos.apply {
             adapter = photoAdapter
