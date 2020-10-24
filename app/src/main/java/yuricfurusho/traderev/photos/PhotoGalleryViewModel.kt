@@ -21,6 +21,8 @@ class PhotoGalleryViewModel(
 
     private val compositeDisposable = CompositeDisposable()
 
+    private val thumbList = mutableListOf<String>()
+
     fun onCreate() {
         reloads()
     }
@@ -29,8 +31,27 @@ class PhotoGalleryViewModel(
         photoRepository.getFirstPage()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ photoList ->
-                _state.postValue(State.Success(photoList.map { it.thumb }))
+            .map { firstPageOfPhotoList -> firstPageOfPhotoList.map { it.thumb } }
+            .subscribe({ firstPageOfThumbs ->
+                thumbList.clear()
+                thumbList.addAll(firstPageOfThumbs)
+                _state.postValue(State.Success(thumbList))
+            }, {
+                _state.postValue(State.Error(it))
+            })
+            .also {
+                compositeDisposable.add(it)
+            }
+    }
+
+    fun loadNextPage() {
+        photoRepository.getNextPage()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .map { nextPageOfPhotoList -> nextPageOfPhotoList.map { it.thumb } }
+            .subscribe({ nextPageOfThumbs ->
+                thumbList.addAll(nextPageOfThumbs)
+                _state.postValue(State.Success(thumbList))
             }, {
                 _state.postValue(State.Error(it))
             })
