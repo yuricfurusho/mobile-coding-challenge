@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_photo_gallery.*
 import yuricfurusho.traderev.photos.PhotoDetailActivity
+import yuricfurusho.traderev.photos.PhotoDetailActivity.Companion.EXTRA_POSITION
 import yuricfurusho.traderev.photos.PhotoDetailActivity.Companion.EXTRA_UNSPLASH_PHOTO
 import yuricfurusho.traderev.photos.PhotoGalleryViewModel
 import yuricfurusho.traderev.photos.PhotoRepository.Companion.PHOTOS_PER_PAGE
@@ -26,6 +27,14 @@ class PhotoGalleryActivity : AppCompatActivity(), PhotoAdapter.PhotoAdapterListe
 
     private lateinit var photoAdapter: PhotoAdapter
     private lateinit var gridLayoutManager: GridLayoutManager
+    private var newPosition: Int = 0
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        newPosition = data?.getIntExtra(EXTRA_POSITION, RecyclerView.NO_POSITION)
+            ?: RecyclerView.NO_POSITION
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         (application as TradeRevApp).appComponent.inject(this)
@@ -52,6 +61,20 @@ class PhotoGalleryActivity : AppCompatActivity(), PhotoAdapter.PhotoAdapterListe
 
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        val viewOfLastSelectedItem = gridLayoutManager.findViewByPosition(newPosition)
+        var lastSelectedItemIsVisible = viewOfLastSelectedItem?.let {
+            gridLayoutManager.isViewPartiallyVisible(it, false, false)
+        } ?: false
+
+
+        if (newPosition != RecyclerView.NO_POSITION && !lastSelectedItemIsVisible) {
+            gridLayoutManager.scrollToPosition(newPosition)
+        }
+    }
+
     private fun onScrollListener(): RecyclerView.OnScrollListener {
         return object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -64,13 +87,20 @@ class PhotoGalleryActivity : AppCompatActivity(), PhotoAdapter.PhotoAdapterListe
         }
     }
 
-    override fun onItemClick(unsplashPhoto: UnsplashPhoto) {
+    override fun onItemClick(unsplashPhotoList: List<UnsplashPhoto>, position: Int) {
         //TODO add ripple animation
         //TODO convert to the intent pattern through viewModel
-        startActivity(
+        startActivityForResult(
             Intent(this, PhotoDetailActivity::class.java).apply {
-                putExtra(EXTRA_UNSPLASH_PHOTO, unsplashPhoto)
-            }
+                putParcelableArrayListExtra(EXTRA_UNSPLASH_PHOTO, ArrayList(unsplashPhotoList))
+                putExtra(EXTRA_POSITION, position)
+            },
+            REQUEST_CODE_UPDATED_POSITION
         )
+    }
+
+    companion object {
+        private const val REQUEST_CODE_UPDATED_POSITION: Int = 1001
+
     }
 }

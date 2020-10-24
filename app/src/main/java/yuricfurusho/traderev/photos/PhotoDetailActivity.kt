@@ -1,28 +1,40 @@
 package yuricfurusho.traderev.photos
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.activity_photo_detail.*
+import yuricfurusho.traderev.PhotoDetailAdapter
 import yuricfurusho.traderev.R
 
 class PhotoDetailActivity : AppCompatActivity() {
+
+    private var photoList: ArrayList<UnsplashPhoto>? = ArrayList()
+    private var position = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_photo_detail)
 
-        val unsplashPhoto = intent.getSerializableExtra(EXTRA_UNSPLASH_PHOTO) as? UnsplashPhoto
-            ?: UnsplashPhoto()
+        photoList = intent.getParcelableArrayListExtra(EXTRA_UNSPLASH_PHOTO)
+        position = intent.getIntExtra(EXTRA_POSITION, 0)
 
-        //TODO add loading
-        Glide.with(this).load(unsplashPhoto.urls.full).into(photo)
-        username.text = unsplashPhoto.user.username
-        unsplashPhoto.likes?.let { likes.text = getString(R.string.likes, it.toString()) }
-        description.text = unsplashPhoto.description
+        photoViewPager.adapter = PhotoDetailAdapter().apply {
+            photoList?.let { setList(it) }
+        }
+        photoViewPager.currentItem = position
+
     }
 
     companion object {
         const val EXTRA_UNSPLASH_PHOTO = "extra_unsplashPhoto"
+        const val EXTRA_POSITION = "extra_position"
     }
+
+    override fun onBackPressed() {
+        setResult(Activity.RESULT_OK, Intent().putExtra(EXTRA_POSITION, photoViewPager.currentItem))
+        super.onBackPressed()
+    }
+
 }
