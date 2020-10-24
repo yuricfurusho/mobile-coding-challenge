@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_photo_gallery.*
 import yuricfurusho.traderev.photos.PhotoDetailActivity
+import yuricfurusho.traderev.photos.PhotoDetailActivity.Companion.EXTRA_POSITION
 import yuricfurusho.traderev.photos.PhotoDetailActivity.Companion.EXTRA_UNSPLASH_PHOTO
 import yuricfurusho.traderev.photos.PhotoGalleryViewModel
 import yuricfurusho.traderev.photos.PhotoRepository.Companion.PHOTOS_PER_PAGE
@@ -64,12 +65,13 @@ class PhotoGalleryActivity : AppCompatActivity(), PhotoAdapter.PhotoAdapterListe
         }
     }
 
-    override fun onItemClick(unsplashPhoto: UnsplashPhoto) {
+    override fun onItemClick(unsplashPhotoList: List<UnsplashPhoto>, position: Int) {
         //TODO add ripple animation
         //TODO convert to the intent pattern through viewModel
         startActivity(
             Intent(this, PhotoDetailActivity::class.java).apply {
-                putExtra(EXTRA_UNSPLASH_PHOTO, unsplashPhoto)
+                putParcelableArrayListExtra(EXTRA_UNSPLASH_PHOTO, ArrayList(unsplashPhotoList))
+                putExtra(EXTRA_POSITION, position)
             }
         )
     }
