@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">mobile-coding-challenge</string>
+    <string name="likes">likes: %1$s</string>
 </resources>
