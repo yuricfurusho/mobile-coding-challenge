@@ -9,7 +9,7 @@ import javax.inject.Singleton
 class PhotoRepository @Inject constructor(
     private val unsplashService: UnsplashService
 ) {
-    var nextPage = 1
+    private var nextPage = 1
 
 
     fun getFirstPage(): Single<List<UnsplashPhoto>> {

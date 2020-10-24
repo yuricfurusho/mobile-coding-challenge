@@ -10,7 +10,7 @@ import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.adapter_photo_detail_item.view.*
 import yuricfurusho.traderev.photos.UnsplashPhoto
 
-class PhotoDetailAdapter() : RecyclerView.Adapter<PhotoDetailAdapter.PhotosViewHolder>() {
+class PhotoDetailAdapter : RecyclerView.Adapter<PhotoDetailAdapter.PhotosViewHolder>() {
 
     private var photoList = mutableListOf<UnsplashPhoto>()
 

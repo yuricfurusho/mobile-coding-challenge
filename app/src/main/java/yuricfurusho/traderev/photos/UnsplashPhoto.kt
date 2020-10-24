@@ -19,8 +19,7 @@ data class UnsplashPhoto(
         parcel.readString(),
         parcel.readValue(Int::class.java.classLoader) as? Int,
         parcel.readParcelable(User::class.java.classLoader)
-    ) {
-    }
+    )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeParcelable(urls, flags)

@@ -65,7 +65,7 @@ class PhotoGalleryActivity : AppCompatActivity(), PhotoAdapter.PhotoAdapterListe
         super.onResume()
 
         val viewOfLastSelectedItem = gridLayoutManager.findViewByPosition(newPosition)
-        var lastSelectedItemIsVisible = viewOfLastSelectedItem?.let {
+        val lastSelectedItemIsVisible = viewOfLastSelectedItem?.let {
             gridLayoutManager.isViewPartiallyVisible(it, false, false)
         } ?: false
 
