@@ -7,13 +7,13 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.adapter_photos_item.view.*
-import yuricfurusho.traderev.photos.UnsplashPhotoUrls
+import yuricfurusho.traderev.photos.UnsplashPhoto
 
 class PhotoAdapter(
     private val mListener: PhotoAdapterListener
 ) : RecyclerView.Adapter<PhotoAdapter.PhotosViewHolder>() {
 
-    private var photoList = mutableListOf<UnsplashPhotoUrls>()
+    private var photoList = mutableListOf<UnsplashPhoto>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotosViewHolder {
         return PhotosViewHolder(
@@ -30,13 +30,13 @@ class PhotoAdapter(
             .load(photoList[position].thumb)
             .into(holder.photo)
 
-        holder.itemView.setOnClickListener { mListener.onItemClick(photoList[position].full) }
+        holder.itemView.setOnClickListener { mListener.onItemClick(photoList[position]) }
 
     }
 
     override fun getItemCount(): Int = photoList.size
 
-    fun setList(photoList: List<UnsplashPhotoUrls>) {
+    fun setList(photoList: List<UnsplashPhoto>) {
         this.photoList.clear()
         this.photoList.addAll(photoList)
         notifyDataSetChanged()
@@ -47,6 +47,6 @@ class PhotoAdapter(
     }
 
     interface PhotoAdapterListener {
-        fun onItemClick(urlFull: String)
+        fun onItemClick(unsplashPhoto: UnsplashPhoto)
     }
 }

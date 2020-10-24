@@ -12,13 +12,17 @@ class PhotoDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_photo_detail)
 
-        val urlFull = intent.getStringExtra(EXTRA_URL_FULL) ?: ""
+        val unsplashPhoto = intent.getSerializableExtra(EXTRA_UNSPLASH_PHOTO) as? UnsplashPhoto
+            ?: UnsplashPhoto()
 
         //TODO add loading
-        Glide.with(this).load(urlFull).into(photo)
+        Glide.with(this).load(unsplashPhoto.urls.full).into(photo)
+        username.text = unsplashPhoto.user.username
+        unsplashPhoto.likes?.let { likes.text = getString(R.string.likes, it.toString()) }
+        description.text = unsplashPhoto.description
     }
 
     companion object {
-        const val EXTRA_URL_FULL = "extra_url_full"
+        const val EXTRA_UNSPLASH_PHOTO = "extra_unsplashPhoto"
     }
 }

@@ -12,7 +12,7 @@ class PhotoGalleryViewModel(
 ) : ViewModel() {
 
     sealed class State {
-        data class Success(val photoList: List<UnsplashPhotoUrls>) : State()
+        data class Success(val photoList: List<UnsplashPhoto>) : State()
         data class Error(val error: Throwable) : State()
     }
 
@@ -21,7 +21,7 @@ class PhotoGalleryViewModel(
 
     private val compositeDisposable = CompositeDisposable()
 
-    private val thumbList = mutableListOf<UnsplashPhotoUrls>()
+    private val thumbList = mutableListOf<UnsplashPhoto>()
 
     fun onCreate() {
         reloads()
@@ -31,7 +31,6 @@ class PhotoGalleryViewModel(
         photoRepository.getFirstPage()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .map { firstPageOfPhotoList -> firstPageOfPhotoList.map { it.urls } }
             .subscribe({ firstPageOfThumbs ->
                 thumbList.clear()
                 thumbList.addAll(firstPageOfThumbs)
@@ -48,7 +47,6 @@ class PhotoGalleryViewModel(
         photoRepository.getNextPage()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .map { nextPageOfPhotoList -> nextPageOfPhotoList.map { it.urls } }
             .subscribe({ nextPageOfThumbs ->
                 thumbList.addAll(nextPageOfThumbs)
                 _state.postValue(State.Success(thumbList))
