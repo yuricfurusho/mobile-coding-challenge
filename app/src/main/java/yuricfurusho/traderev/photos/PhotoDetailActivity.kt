@@ -1,5 +1,7 @@
 package yuricfurusho.traderev.photos
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_photo_detail.*
@@ -29,4 +31,10 @@ class PhotoDetailActivity : AppCompatActivity() {
         const val EXTRA_UNSPLASH_PHOTO = "extra_unsplashPhoto"
         const val EXTRA_POSITION = "extra_position"
     }
+
+    override fun onBackPressed() {
+        setResult(Activity.RESULT_OK, Intent().putExtra(EXTRA_POSITION, photoViewPager.currentItem))
+        super.onBackPressed()
+    }
+
 }
