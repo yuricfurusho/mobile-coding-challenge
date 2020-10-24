@@ -4,7 +4,6 @@ import io.reactivex.Single
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val PHOTOS_PER_PAGE = 10
 
 @Singleton
 class PhotoRepository @Inject constructor(
@@ -19,5 +18,9 @@ class PhotoRepository @Inject constructor(
     }
 
     fun getNextPage() = unsplashService.getPhotos(nextPage++, PHOTOS_PER_PAGE)
+
+    companion object {
+        const val PHOTOS_PER_PAGE = 40
+    }
 }
 

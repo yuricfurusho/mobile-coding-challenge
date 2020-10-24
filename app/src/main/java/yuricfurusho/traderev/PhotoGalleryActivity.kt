@@ -4,12 +4,11 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import androidx.recyclerview.widget.StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
-import androidx.recyclerview.widget.StaggeredGridLayoutManager.VERTICAL
 import kotlinx.android.synthetic.main.activity_photo_gallery.*
 import yuricfurusho.traderev.photos.PhotoGalleryViewModel
+import yuricfurusho.traderev.photos.PhotoRepository.Companion.PHOTOS_PER_PAGE
 import javax.inject.Inject
 
 private const val SPAN_COUNT = 2
@@ -21,7 +20,7 @@ class PhotoGalleryActivity : AppCompatActivity() {
     private val viewModel by viewModels<PhotoGalleryViewModel> { viewModelFactory }
 
     private lateinit var photoAdapter: PhotoAdapter
-    private lateinit var staggeredGridLayoutManager: StaggeredGridLayoutManager
+    private lateinit var gridLayoutManager: GridLayoutManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         (application as TradeRevApp).appComponent.inject(this)
@@ -29,11 +28,10 @@ class PhotoGalleryActivity : AppCompatActivity() {
         setContentView(R.layout.activity_photo_gallery)
 
         photoAdapter = PhotoAdapter()
-        staggeredGridLayoutManager = StaggeredGridLayoutManager(SPAN_COUNT, VERTICAL)
-        staggeredGridLayoutManager.gapStrategy = GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
+        gridLayoutManager = GridLayoutManager(this, SPAN_COUNT)
         recycler_photos.apply {
             adapter = photoAdapter
-            layoutManager = staggeredGridLayoutManager
+            layoutManager = gridLayoutManager
             addOnScrollListener(onScrollListener())
         }
 
@@ -51,10 +49,9 @@ class PhotoGalleryActivity : AppCompatActivity() {
     private fun onScrollListener(): RecyclerView.OnScrollListener {
         return object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                val lastVisibleItemsIndexes =
-                    staggeredGridLayoutManager.findLastVisibleItemPositions(null)
+                val lastVisibleItemPosition = gridLayoutManager.findLastVisibleItemPosition()
                 val lastLoadedItemIndex = (photoAdapter.itemCount - 1).coerceAtLeast(0)
-                if (lastVisibleItemsIndexes.contains(lastLoadedItemIndex)) {
+                if (lastVisibleItemPosition > lastLoadedItemIndex - PHOTOS_PER_PAGE / 2) {
                     viewModel.loadNextPage()
                 }
             }
