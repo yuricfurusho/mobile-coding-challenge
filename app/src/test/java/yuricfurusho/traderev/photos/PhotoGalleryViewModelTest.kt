@@ -19,6 +19,8 @@ private val SECOND_PAGE = listOf(
     UnsplashPhoto(null, "2", null, null)
 )
 
+private val EXCEPTION = Exception()
+
 @RunWith(MockitoJUnitRunner::class)
 class PhotoGalleryViewModelTest {
 
@@ -30,6 +32,7 @@ class PhotoGalleryViewModelTest {
 
     private lateinit var firstPage: Single<List<UnsplashPhoto>>
     private lateinit var secondPage: Single<List<UnsplashPhoto>>
+    private lateinit var error: Single<List<UnsplashPhoto>>
 
     @Before
     fun setUp() {
@@ -41,6 +44,7 @@ class PhotoGalleryViewModelTest {
 
         firstPage = Single.just(FIRST_PAGE)
         secondPage = Single.just(SECOND_PAGE)
+        error = Single.error(EXCEPTION)
     }
 
     @Test
@@ -53,7 +57,16 @@ class PhotoGalleryViewModelTest {
     }
 
     @Test
-    fun loadNextPage() {
+    fun failsToRetrieveFirstPage() {
+        whenever(photoRepository.getFirstPage()).thenReturn(error)
+
+        viewModel.onCreate()
+
+        assertEquals(PhotoGalleryViewModel.State.Error(EXCEPTION), viewModel.state.value!!)
+    }
+
+    @Test
+    fun successfullyRetrievesNextPage() {
         whenever(photoRepository.getFirstPage()).thenReturn(firstPage)
         whenever(photoRepository.getNextPage()).thenReturn(secondPage)
         val combinedPhotoList = mutableListOf<UnsplashPhoto>()
@@ -68,6 +81,18 @@ class PhotoGalleryViewModelTest {
             PhotoGalleryViewModel.State.Success(combinedPhotoList),
             viewModel.state.value!!
         )
+    }
 
+
+    @Test
+    fun failsToRetrieveNextPage() {
+        whenever(photoRepository.getFirstPage()).thenReturn(firstPage)
+        whenever(photoRepository.getNextPage()).thenReturn(error)
+
+        viewModel.onCreate()
+        assertEquals(PhotoGalleryViewModel.State.Success(FIRST_PAGE), viewModel.state.value!!)
+
+        viewModel.loadNextPage()
+        assertEquals(PhotoGalleryViewModel.State.Error(EXCEPTION), viewModel.state.value!!)
     }
 }
