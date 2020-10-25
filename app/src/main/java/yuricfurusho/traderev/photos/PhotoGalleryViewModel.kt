@@ -3,12 +3,13 @@ package yuricfurusho.traderev.photos
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 
 class PhotoGalleryViewModel(
-    private val photoRepository: PhotoRepository
+    private val photoRepository: PhotoRepository,
+    private val ioScheduler: Scheduler,
+    private val uiScheduler: Scheduler
 ) : ViewModel() {
 
     sealed class State {
@@ -21,7 +22,7 @@ class PhotoGalleryViewModel(
 
     private val compositeDisposable = CompositeDisposable()
 
-    private val thumbList = mutableListOf<UnsplashPhoto>()
+    private val unsplashPhotoList = mutableListOf<UnsplashPhoto>()
 
     fun onCreate() {
         reloads()
@@ -29,12 +30,12 @@ class PhotoGalleryViewModel(
 
     private fun reloads() {
         photoRepository.getFirstPage()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ firstPageOfThumbs ->
-                thumbList.clear()
-                thumbList.addAll(firstPageOfThumbs)
-                _state.postValue(State.Success(thumbList))
+            .subscribeOn(ioScheduler)
+            .observeOn(uiScheduler)
+            .subscribe({ firstPageOfPhotos ->
+                unsplashPhotoList.clear()
+                unsplashPhotoList.addAll(firstPageOfPhotos)
+                _state.postValue(State.Success(unsplashPhotoList))
             }, {
                 _state.postValue(State.Error(it))
             })
@@ -45,11 +46,11 @@ class PhotoGalleryViewModel(
 
     fun loadNextPage() {
         photoRepository.getNextPage()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ nextPageOfThumbs ->
-                thumbList.addAll(nextPageOfThumbs)
-                _state.postValue(State.Success(thumbList))
+            .subscribeOn(ioScheduler)
+            .observeOn(uiScheduler)
+            .subscribe({ nextPageOfPhotos ->
+                unsplashPhotoList.addAll(nextPageOfPhotos)
+                _state.postValue(State.Success(unsplashPhotoList))
             }, {
                 _state.postValue(State.Error(it))
             })

@@ -10,13 +10,13 @@ import org.mockito.ArgumentMatchers.*
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 
-val FIRST_PAGE = listOf(
+private val FIRST_PAGE = listOf(
     UnsplashPhoto(null, "1", null, null)
 )
-val SECOND_PAGE = listOf(
+private val SECOND_PAGE = listOf(
     UnsplashPhoto(null, "2", null, null)
 )
-val THIRD_PAGE = listOf(
+private val THIRD_PAGE = listOf(
     UnsplashPhoto(null, "3", null, null)
 )
 
